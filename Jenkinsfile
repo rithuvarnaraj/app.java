@@ -8,9 +8,15 @@ pipeline {
 
     environment {
         // Set Java home, assuming you have JDK installed in Jenkins
-        JAVA_HOME = '/path/to/your/jdk' 
+        JAVA_HOME = '/path/to/your/jdk'
     }
 
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from Git or any other SCM
+                git 'https://github.com/your-repository-url.git'
+            }
         }
 
         stage('Build') {
