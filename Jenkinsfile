@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout the source code from Git or any other SCM
-                git 'https://github.com/your-repository-url.git'
+                git 'https://github.com/rithuvarnaraj/app.java/'
             }
         }
 
