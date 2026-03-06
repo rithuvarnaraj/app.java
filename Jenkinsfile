@@ -8,13 +8,6 @@ pipeline {
 
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Checkout the source code from Git or any other SCM
-                git 'https://github.com/rithuvarnaraj/app.java.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 script {
