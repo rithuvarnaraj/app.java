@@ -3,13 +3,9 @@ pipeline {
 
     tools {
         // Make sure that Maven is installed in Jenkins. You can install it and specify the name here.
-        maven 'Maven 3.8.1'
+        maven 'buildmaven'
     }
 
-    environment {
-        // Set Java home, assuming you have JDK installed in Jenkins
-        JAVA_HOME = '/path/to/your/jdk'
-    }
 
     stages {
         stage('Checkout') {
