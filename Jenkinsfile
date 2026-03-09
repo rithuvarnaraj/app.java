@@ -1,45 +1,42 @@
 pipeline {
     agent any
 
-    tools {
-        // Make sure that Maven is installed in Jenkins. You can install it and specify the name here.
-        maven 'buildmaven'
+    environment {
+        GITHUB_CREDS = credentials('github-packages-cred')
+        JAVA_HOME    = tool name: 'jdk11'
+        MAVEN_HOME   = tool name: 'maven3'
+        PATH         = "${JAVA_HOME}/bin:${PATH}"
     }
 
-
     stages {
-        stage('Build') {
+
+        stage('Checkout Code') {
             steps {
-                script {
-                    // Run Maven to build the project
-                    sh 'mvn clean install'
-                }
+                checkout scm
             }
         }
 
-        stage('Test') {
+        stage('Build & Deploy') {
             steps {
-                script {
-                    // Run tests using Maven
-                    sh 'mvn test'
-                }
-            }
-        }
+                configFileProvider([configFile(fileId: 'maven-github-settings', variable: 'MAVEN_SETTINGS')]) {
+                    sh """
+                        export GH_USER=${GITHUB_CREDS_USR}
+                        export GH_TOKEN=${GITHUB_CREDS_PSW}
 
-        stage('Deploy') {
-            steps {
-                script {
-                    // Optional: Deploy your application (e.g., to a server)
-                    echo "Deploying the application..."
+                        ${MAVEN_HOME}/bin/mvn -s $MAVEN_SETTINGS -B clean package
+                        ${MAVEN_HOME}/bin/mvn -s $MAVEN_SETTINGS -B deploy
+                    """
                 }
             }
         }
     }
 
     post {
-        always {
-            // Actions that will always be run after the pipeline finishes
-            echo "Pipeline execution complete."
+        success {
+            echo "✅ Build and deployment to GitHub Packages completed successfully."
+        }
+        failure {
+            echo "❌ Pipeline failed. Check the console output for details."
         }
     }
 }
