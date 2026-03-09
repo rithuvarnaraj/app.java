@@ -1,10 +1,12 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'buildmaven'
+    }
+
     environment {
         GITHUB_CREDS = credentials('github-packages-cred')
-        MAVEN_HOME   = tool name: 'buildmaven'
-        PATH         = "${JAVA_HOME}/bin:${PATH}"
     }
 
     stages {
@@ -18,13 +20,13 @@ pipeline {
         stage('Build & Deploy') {
             steps {
                 configFileProvider([configFile(fileId: 'maven-github-settings', variable: 'MAVEN_SETTINGS')]) {
-                    sh """
-                        export GH_USER=${GITHUB_CREDS_USR}
-                        export GH_TOKEN=${GITHUB_CREDS_PSW}
+                    sh '''
+                        export GH_USER=$GITHUB_CREDS_USR
+                        export GH_TOKEN=$GITHUB_CREDS_PSW
 
-                        ${MAVEN_HOME}/bin/mvn -s $MAVEN_SETTINGS -B clean package
-                        ${MAVEN_HOME}/bin/mvn -s $MAVEN_SETTINGS -B deploy
-                    """
+                        mvn -s $MAVEN_SETTINGS -B clean package
+                        mvn -s $MAVEN_SETTINGS -B deploy
+                    '''
                 }
             }
         }
