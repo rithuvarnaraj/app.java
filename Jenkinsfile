@@ -1,19 +1,42 @@
-stage('Build Docker Image') {
-    steps {
-        script {
-            sh 'docker build -t rithuvarnaraj/jenkins-demo:latest .'
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "rithuvarnaraj/jenkins-demo"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/rithuvarnaraj/app.java.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:latest .'
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $DOCKER_IMAGE:latest'
+            }
         }
     }
-}
 
-stage('Login to Docker Hub') {
-    steps {
-        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-    }
-}
-
-stage('Push Image to Docker Hub') {
-    steps {
-        sh 'docker push rithuvarnaraj/jenkins-demo:latest'
+    post {
+        always {
+            sh 'docker logout'
+        }
     }
 }
