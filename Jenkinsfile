@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/rithuvarnaraj/app.java.git'
+                git branch: 'main', url: 'https://github.com/rithuvarnaraj/app.java.git'
             }
         }
 
@@ -32,6 +32,7 @@ pipeline {
                 sh 'docker push $DOCKER_IMAGE:latest'
             }
         }
+
     }
 
     post {
